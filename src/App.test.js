@@ -13,6 +13,18 @@ const findFormElement = (wrapper, fieldName, formElementSubSelector) => {
   return formElement;
 };
 
+const checkCheckbox = (wrapper, fieldName, checked) => {
+  const input = findFormElement(wrapper, fieldName, "input");
+  if (input.length === 0) {
+    throw new Error(
+      `Could not find checkbox for field ${fieldName} in ${wrapper.debug()}`
+    );
+  }
+  // input.simulate("click");
+  input.simulate("change", { target: { checked } });
+  return findFormElement(wrapper, fieldName, "input");
+};
+
 const selectRadioButton = (wrapper, fieldName, radioButtonValue) => {
   const input = findFormElement(
     wrapper,
@@ -75,4 +87,7 @@ test("user can fill out and submit to API", () => {
 
   const bio = enterText(wrapper, "bio", "My bio");
   expect(bio.props().value).toBe("My bio");
+
+  const agreesToTerms = checkCheckbox(wrapper, "agreesToTerms", true);
+  expect(agreesToTerms.props().checked).toBe(true);
 });
