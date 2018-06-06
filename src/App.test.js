@@ -2,43 +2,62 @@ import React from "react";
 import { mount } from "enzyme";
 import App from "./App";
 
-const selectRadioButton = (wrapper, fieldName, newValue) => {
-  const selector = `[field="${fieldName}"] input[value="${newValue}"]`;
-  const input = wrapper.find(selector);
+const findFormElement = (wrapper, fieldName, formElementSubSelector) => {
+  const selector = `[field="${fieldName}"] ${formElementSubSelector}`;
+  const formElement = wrapper.find(selector);
+  if (formElement.length > 1) {
+    throw new Element(
+      `Found > 1 form elements for selector ${selector} in: ${formElement.debug()}`
+    );
+  }
+  return formElement;
+};
+
+const selectRadioButton = (wrapper, fieldName, radioButtonValue) => {
+  const input = findFormElement(
+    wrapper,
+    fieldName,
+    `input[value="${radioButtonValue}"]`
+  );
   if (input.length === 0) {
-    throw new Error(`Could not find radio button for selector ${selector}`);
+    throw new Error(
+      `Could not find radio button for field ${fieldName} and value ${radioButtonValue}`
+    );
   }
   input.simulate("change", {
-    target: { value: newValue }
+    target: { value: radioButtonValue }
   });
 
-  return wrapper.find(selector);
+  return findFormElement(
+    wrapper,
+    fieldName,
+    `input[value="${radioButtonValue}"]`
+  );
+};
+
+const findInputOrTextarea = (wrapper, fieldName) => {
+  const input = findFormElement(wrapper, fieldName, "input");
+  if (input.length === 1) {
+    return input;
+  }
+
+  const textarea = findFormElement(wrapper, fieldName, "textarea");
+  if (textarea.length === 1) {
+    return textarea;
+  }
+
+  throw new Error(
+    `Could not find textarea or input for fieldName ${fieldName} in ${wrapper.debug()}`
+  );
 };
 
 const enterText = (wrapper, fieldName, newValue) => {
-  const selector = `[field="${fieldName}"] input`;
-  const input = wrapper.find(selector);
-  if (input.length === 0) {
-    throw new Error(`Could not find textarea for selector ${selector}`);
-  }
+  const input = findInputOrTextarea(wrapper, fieldName);
   input.simulate("change", {
     target: { value: newValue }
   });
 
-  return wrapper.find(selector);
-};
-
-const enterTextarea = (wrapper, fieldName, newValue) => {
-  const selector = `[field="${fieldName}"] textarea`;
-  const input = wrapper.find(selector);
-  if (input.length === 0) {
-    throw new Error(`Could not find textarea for selector ${selector}`);
-  }
-  input.simulate("change", {
-    target: { value: newValue }
-  });
-
-  return wrapper.find(selector);
+  return findInputOrTextarea(wrapper, fieldName);
 };
 
 test("user can fill out and submit to API", () => {
@@ -53,6 +72,6 @@ test("user can fill out and submit to API", () => {
   const gender = selectRadioButton(wrapper, "gender", "male");
   expect(gender.props().value).toBe("male");
 
-  const bio = enterTextarea(wrapper, "bio", "My bio");
+  const bio = enterText(wrapper, "bio", "My bio");
   expect(bio.props().value).toBe("My bio");
 });
