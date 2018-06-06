@@ -1,6 +1,23 @@
 .App {
+  margin-top: 40px;
+  margin-left: 40px;
 }
 
 .ContactForm {
-  margin-top: 50px;
+}
+
+input,
+textarea {
+  display: block;
+  margin-bottom: 20px;
+}
+
+input[type="radio"] {
+  display: inline;
+  margin-left: 10px;
+}
+
+input[type="checkbox"] {
+  display: inline;
+  margin-left: 0;
 }

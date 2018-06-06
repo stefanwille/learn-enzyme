@@ -62,6 +62,7 @@ const enterText = (wrapper, fieldName, newValue) => {
 
 test("user can fill out and submit to API", () => {
   const wrapper = mount(<App />);
+  const form = wrapper.find("form");
 
   const firstName = enterText(wrapper, "firstName", "Esteban");
   expect(firstName.props().value).toBe("Esteban");
