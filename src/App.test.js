@@ -100,14 +100,11 @@ test("user can fill out and submit to API", async () => {
   const agreesToTerms = checkCheckbox(wrapper, "agreesToTerms", true);
   expect(agreesToTerms.props().checked).toBe(true);
 
-  const apiRequestPromise = Promise.resolve({ data: "cool, done" });
   jest.spyOn(axios, "post").mockImplementation(async (url, data) => {
-    return apiRequestPromise;
+    return Promise.resolve({ data: "cool, done" });
   });
-
   wrapper.find(".ContactForm").simulate("submit", { preventDefault: () => {} });
   await nextTick();
-  // console.log("**call", App.prototype.handleFormSubmit.mock.calls);
   expect(axios.post).toHaveBeenCalledWith("http://localhost:3000/something", {
     agreesToTerms: true,
     bio: "My bio",
