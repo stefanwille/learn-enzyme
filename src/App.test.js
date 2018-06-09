@@ -78,13 +78,9 @@ const submitForm = (wrapper, selector) => {
   form.simulate("submit", { preventDefault: () => {} });
 };
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-function nextTick() {
-  return sleep(0);
-}
+const nextTick = () => {
+  return new Promise(resolve => process.nextTick(resolve));
+};
 
 test("user can fill out and submit to API", async () => {
   const wrapper = mount(<App />);
