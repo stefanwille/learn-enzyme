@@ -97,12 +97,11 @@ test("user can fill out and submit to API", async () => {
   expect(agreesToTerms.props().checked).toBe(true);
 
   jest.spyOn(axios, "post").mockImplementation(async (url, data) => {
-    await sleep(100);
     return Promise.resolve({ data: "cool, done" });
   });
 
   wrapper.find(".ContactForm").simulate("submit", { preventDefault: () => {} });
-  await sleep(200);
+  await sleep(1);
   expect(axios.post).toHaveBeenCalledWith("http://localhost:3000/something", {
     agreesToTerms: true,
     bio: "My bio",
