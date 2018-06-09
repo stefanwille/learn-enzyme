@@ -1,6 +1,7 @@
 import React from "react";
 import { mount } from "enzyme";
 import App from "./App";
+import axios from "axios";
 
 const findFormElement = (wrapper, fieldName, formElementSubSelector) => {
   const selector = `[field="${fieldName}"] ${formElementSubSelector}`;
@@ -72,7 +73,11 @@ const enterText = (wrapper, fieldName, newValue) => {
   return findInputOrTextarea(wrapper, fieldName);
 };
 
-test("user can fill out and submit to API", () => {
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+test("user can fill out and submit to API", async () => {
   const wrapper = mount(<App />);
   const form = wrapper.find("form");
 
@@ -90,4 +95,18 @@ test("user can fill out and submit to API", () => {
 
   const agreesToTerms = checkCheckbox(wrapper, "agreesToTerms", true);
   expect(agreesToTerms.props().checked).toBe(true);
+
+  jest.spyOn(axios, "post").mockImplementation(async (url, data) => {
+    await sleep(100);
+    return Promise.resolve({ data: "cool, done" });
+  });
+
+  wrapper.find(".ContactForm").simulate("submit", { preventDefault: () => {} });
+  await sleep(200);
+  expect(axios.post).toHaveBeenCalledWith("http://localhost:3000/something", {
+    agreesToTerms: true,
+    bio: "My bio",
+    firstName: "Esteban",
+    lastName: "Caldron"
+  });
 });
