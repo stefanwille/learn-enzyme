@@ -73,6 +73,11 @@ const enterText = (wrapper, fieldName, newValue) => {
   return findInputOrTextarea(wrapper, fieldName);
 };
 
+const submitForm = (wrapper, selector) => {
+  const form = wrapper.find(selector);
+  form.simulate("submit", { preventDefault: () => {} });
+};
+
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -103,7 +108,7 @@ test("user can fill out and submit to API", async () => {
   jest.spyOn(axios, "post").mockImplementation(async (url, data) => {
     return Promise.resolve({ data: "cool, done" });
   });
-  wrapper.find(".ContactForm").simulate("submit", { preventDefault: () => {} });
+  submitForm(wrapper, ".ContactForm");
   await nextTick();
   expect(axios.post).toHaveBeenCalledWith("http://localhost:3000/something", {
     agreesToTerms: true,
